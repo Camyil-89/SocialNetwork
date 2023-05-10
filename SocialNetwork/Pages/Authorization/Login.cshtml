@@ -1,0 +1,135 @@
+﻿@page
+@model SocialNetwork.Pages.Login.LoginModel
+@{
+}
+
+<style>
+	.center-box {
+		display: flex;
+		justify-content: center;
+		align-items: flex-start; /* change from center to flex-start */
+		height: 100vh;
+	}
+
+	form {
+		width: 400px;
+		margin: 0 auto; /* center the form */
+		background-color: #f2f2f2;
+		padding: 20px;
+		border-radius: 5px;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	}
+
+	label,
+	input[type="text"],
+	input[type="password"],
+	button {
+		display: block;
+		margin-bottom: 10px;
+	}
+
+	label {
+		font-weight: bold;
+	}
+
+	input[type="text"],
+	input[type="password"] {
+		padding: 10px;
+		border: none;
+		border-radius: 3px;
+		background-color: #fff;
+		box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+		width: 100%;
+	}
+
+	h2 {
+		text-align: center;
+		margin-top: 0;
+	}
+
+	.btn-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+		.btn-container button {
+			padding: 10px;
+			border: none;
+			border-radius: 3px;
+			width: 48%;
+			cursor: pointer;
+			transition: all 0.2s ease-in-out;
+		}
+
+			.btn-container button:hover {
+				background-color: #333;
+				color: #fff;
+			}
+
+			.btn-container button:active {
+				transform: translateY(1px);
+				background-color: #008CBA;
+				color: #fff;
+			}
+
+			.btn-container button:first-child {
+				background-color: #4CAF50;
+				color: #fff;
+			}
+
+			.btn-container button:last-child {
+				background-color: #008CBA;
+				color: #fff;
+			}
+
+</style>
+<div class="center-box">
+	@if (Model.IsLogin)
+	{
+		<form method="post" asp-page-handler="login">
+			<h2>Авторизация в SocialNetwork</h2>
+			<label for="username">Логин</label>
+			<input type="text" name="login" placeholder="Введите логин" required>
+
+			<label for="password">Пароль</label>
+			<input type="password" name="password" placeholder="Введите пароль" required>
+			<div class="btn-container">
+				<button type="submit">Войти</button>
+				<button type="button" onclick="redirectToRegistration()">Зарегистрироваться</button>
+			</div>
+			<div style="color: red">@Model.ErrorMessage</div>
+		</form>
+	}
+	else
+	{
+		<form method="post" asp-page-handler="registration">
+			<h2>Регистрация в SocialNetwork</h2>
+			<label for="username">Логин</label>
+			<input type="text" name="login" placeholder="Введите логин" required>
+
+			<label for="password">Пароль</label>
+			<input type="password" name="password" placeholder="Введите пароль" required>
+
+			<label for="password">Имя</label>
+			<input type="password" name="username_1" placeholder="Введите имя" required>
+
+			<label for="password">Фамилия</label>
+			<input type="password" name="username_2" placeholder="Введите фамилию" required>
+
+			<label for="password">Отчество</label>
+			<input type="password" name="username_3" placeholder="Введите отчество">
+
+			<div class="btn-container" style="justify-content: center;">
+				<button type="submit">Зарегистрироваться</button>
+			</div>
+
+		</form>
+	}
+</div>
+
+<script>
+	function redirectToRegistration() {
+		window.location.href = '/Authorization/Login?type=reg';
+	}
+</script>
