@@ -1,0 +1,52 @@
+﻿@page
+@model SocialNetwork.Pages.Friends.FindModel
+@{
+	Layout = "..\\Shared\\_LayoutIndex.cshtml";
+}
+
+<style>
+	.card-friend {
+		margin-top: 25px;
+	}
+
+		.card-friend :hover {
+			background-color: #f8f8f8;
+			cursor: pointer;
+		}
+</style>
+
+<div class="container">
+	<form class="form-inline my-3">
+		<div class="input-group">
+			<input class="form-control" type="search" name="search" placeholder="Поиск друзей" aria-label="Search">
+			<div class="input-group-append" style="margin-left: 10px;">
+				<button class="btn btn-outline-success" type="submit">Найти</button>
+			</div>
+		</div>
+	</form>
+
+	<div class="row">
+		@foreach (var user in Model.Users)
+		{
+			<div class="col-sm-4 card-friend" data-id="@user.Id">
+				<div class="card">
+					@*<img class="card-img-top" src="friend3.jpg" alt="Друг 3">*@
+					<div class="card-body">
+						<a>@user.Name_1 @user.Name_2 @user.Name_3</a>
+						<p class="card-text">ID: @user.Id</p>
+					</div>
+				</div>
+			</div>
+		}
+
+	</div>
+</div>
+
+<script>
+	document.querySelectorAll('.card-friend').forEach(card => {
+		card.addEventListener('click', () => {
+			const userId = card.getAttribute('data-id');
+			window.location.href = `/account/profile?id=${userId}`;
+		});
+	});
+</script>

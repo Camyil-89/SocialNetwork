@@ -3,5 +3,79 @@
 @{
 	Layout = "..\\Shared\\_LayoutIndex.cshtml";
 }
+<div class="container">
+	@if (Model.NotFound)
+	{
+		<h1>Профиль не найден!</h1>
+	}
+	else
+	{
+		<div class="row">
+			<div class="col-md-3 col-sm-12">
+				<img src="your-photo.jpg" alt="Your Photo" class="img-responsive">
+			</div>
+			<div class="col-md-9 col-sm-12 profile-block">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="profile-block-left">
+							@Model.Name_1
+							@Model.Name_2
+							@Model.Name_3
+						</div>
+					</div>
+					<div class="col-md-6">
+						@if (@User.FindFirst("id").Value.ToString() == @Model.ID)
+						{
+							<div class="profile-block-right">
+								Это ваш профиль
+							</div>
+						}
 
-<h1>asdasATESTSETS</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="news-block">
+					<h4>Стена</h4>
+					<ul>
+						<li class="news-item"><a href="#">Лол</a></li>
+						<li class="news-item"><a href="#">Кек</a></li>
+						<li class="news-item"><a href="#">Чебурек</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	}
+</div>
+
+<style>
+	.news-block {
+		height: auto;
+		min-height: 100px;
+		margin-bottom: 30px;
+	}
+
+	.news-item {
+		display: block;
+		padding: 10px;
+		border: 1px solid #ccc;
+		margin-bottom: 10px;
+	}
+
+	.profile-block {
+		min-height: 200px;
+	}
+
+	.profile-block-left {
+		float: left;
+		width: 50%;
+	}
+
+	.profile-block-right {
+		float: right;
+		text-align: right;
+		width: 50%;
+	}
+</style>

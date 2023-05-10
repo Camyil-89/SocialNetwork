@@ -1,0 +1,74 @@
+﻿@page
+@model SocialNetwork.Pages.Account.ProfileSettingsModel
+@{
+	Layout = "..\\Shared\\_LayoutIndex.cshtml";
+}
+<style>
+	.btn {
+		white-space: nowrap;
+		overflow: hidden;
+		margin-top: 10px;
+	}
+	.fix-left{
+		min-width: 200px;
+	}
+
+</style>
+<div class="container">
+	<form class="row border-bottom pb-3" method="post" asp-page-handler="ChangeName">
+		<div class="col-md-3 fix-left">
+			<h4>Общие настройки</h4>
+			<div style="color: red">@Model.ErrorMessageUserName</div>
+		</div>
+		<div class="col-md-9">
+			<div class="form-group">
+				<label for="inputName">Имя</label>
+				<input type="text" class="form-control" name="username_1" placeholder="Введите свое имя" required value="@User.FindFirst("username_1").Value">
+			</div>
+			<div class="form-group">
+				<label for="inputName">Фамилию</label>
+				<input type="text" class="form-control" name="username_2" placeholder="Введите свою фамилию" required value="@User.FindFirst("username_2").Value">
+			</div>
+			<div class="form-group">
+				<label for="inputName">Отчество</label>
+				<input type="text" class="form-control" name="username_3" placeholder="Введите свое отчество" value="@User.FindFirst("username_3").Value">
+			</div>
+
+		</div>
+		<div class="col-md-3 fix-left">
+			<button type="submit" class="btn btn-primary btn-block">Сохранить изменения</button>
+		</div>
+	</form>
+	<form class="row border-bottom pb-3" method="post" asp-page-handler="ChangePassword" onsubmit="return checkPasswords()">
+		<div class="col-md-3">
+			<h4>Настройки безопастности</h4>
+			<div style="color: red">@Model.ErrorMessagePassword</div>
+		</div>
+		<div class="col-md-9">
+			<div class="form-group">
+				<label for="inputPassword">Изменить пароль</label>
+				<input type="password" class="form-control" name="inputPassword" id="inputPassword" placeholder="Введите свой пароль" required>
+			</div>
+			<div class="form-group">
+				<label for="inputConfirmPassword">Повторите пароль</label>
+				<input type="password" class="form-control" name="inputConfirmPassword" id="inputConfirmPassword" placeholder="Подтвердите свой пароль" required>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<button type="submit" class="btn btn-primary">Сохранить изменения</button>
+		</div>
+	</form>
+</div>
+
+
+<script>
+	function checkPasswords() {
+		var password = document.getElementById("inputPassword").value;
+		var confirmPassword = document.getElementById("inputConfirmPassword").value;
+		if (password != confirmPassword) {
+			alert("Пароли не совпадают");
+			return false;
+		}
+		return true;
+	}
+</script>

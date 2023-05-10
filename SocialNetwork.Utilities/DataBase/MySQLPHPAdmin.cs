@@ -53,7 +53,7 @@ namespace SocialNetwork.Utilities.DataBase
 		public DataTable SqlLoginUser(string login, string pass)
 		{
 			MySqlCommand command = new MySqlCommand("SELECT * FROM `users` WHERE `login` = @login AND `password` = @pass;", _sql_connection);
-			command.Parameters.AddWithValue("@login", Cryptography.Checksum.Compute(login));
+			command.Parameters.AddWithValue("@login", login);
 			command.Parameters.AddWithValue("@pass", Cryptography.Checksum.Compute(pass));
 			return SqlExecute(command);
 		}
@@ -65,6 +65,7 @@ namespace SocialNetwork.Utilities.DataBase
 			{
 				Stopwatch stopwatch = new Stopwatch();
 				stopwatch.Start();
+				sqlCommand.Connection = _sql_connection;
 				MySqlDataAdapter adapter = new MySqlDataAdapter();
 				adapter.SelectCommand = sqlCommand;
 				DataTable dtable = new DataTable();
@@ -77,7 +78,7 @@ namespace SocialNetwork.Utilities.DataBase
 		public DataTable SqlNewUser(string login, string pass, string username_1, string username_2, string username_3)
 		{
 			MySqlCommand command = new MySqlCommand($"INSERT INTO `users` (`id`, `login`, `password`, `username_1`, `username_2`, `username_3`) VALUES (NULL, @login, @pass, @name_1, @name_2, @name_3);", _sql_connection);
-			command.Parameters.AddWithValue($"@login", Cryptography.Checksum.Compute(login));
+			command.Parameters.AddWithValue($"@login", login);
 			command.Parameters.AddWithValue($"@pass", Cryptography.Checksum.Compute(pass));
 			command.Parameters.AddWithValue($"@name_1", username_1);
 			command.Parameters.AddWithValue($"@name_2", username_2);
@@ -85,9 +86,26 @@ namespace SocialNetwork.Utilities.DataBase
 			return SqlExecute(command);
 		}
 
+		public DataTable SqlGetAllUsers()
+		{
+			MySqlCommand command = new MySqlCommand($"SELECT * FROM `users`;");
+			return SqlExecute(command);
+		}
 		public DataTable SqlQuery(string sql)
 		{
 			return SqlExecute(new MySqlCommand(sql, _sql_connection));
+		}
+
+		public DataTable SqlQuery(MySqlCommand command)
+		{
+			return SqlExecute(command);
+		}
+
+		public DataTable SqlGetUser(string id)
+		{
+			MySqlCommand command = new MySqlCommand($"SELECT * FROM `users` WHERE `id` = @id;");
+			command.Parameters.AddWithValue("@id", id);
+			return SqlExecute(command);
 		}
 	}
 }

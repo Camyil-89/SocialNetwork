@@ -111,19 +111,19 @@
 			<label for="password">Пароль</label>
 			<input type="password" name="password" placeholder="Введите пароль" required>
 
-			<label for="password">Имя</label>
-			<input type="password" name="username_1" placeholder="Введите имя" required>
+			<label for="text">Имя</label>
+			<input type="text" name="username_1" placeholder="Введите имя" required>
 
-			<label for="password">Фамилия</label>
-			<input type="password" name="username_2" placeholder="Введите фамилию" required>
+			<label for="text">Фамилия</label>
+			<input type="text" name="username_2" placeholder="Введите фамилию" required>
 
-			<label for="password">Отчество</label>
-			<input type="password" name="username_3" placeholder="Введите отчество">
+			<label for="text">Отчество</label>
+			<input type="text" name="username_3" placeholder="Введите отчество">
 
 			<div class="btn-container" style="justify-content: center;">
 				<button type="submit">Зарегистрироваться</button>
 			</div>
-
+			<div style="color: red">@Model.ErrorMessage</div>
 		</form>
 	}
 </div>
