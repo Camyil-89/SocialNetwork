@@ -22,6 +22,8 @@ namespace SocialNetwork
 
 
 			// Add services to the container.
+			builder.Services.AddSignalR();
+			builder.Services.AddControllers();
 			builder.Services.AddRazorPages();
 
 			var app = builder.Build();
@@ -43,8 +45,14 @@ namespace SocialNetwork
 			app.UseAuthorization();
 
 			app.MapRazorPages();
+			app.MapControllers();
 
 			Service.DataBase.DataBaseProvider.Init("server=localhost;port=3306;username=webapi;password=!1N7XmccClyGXMOb;database=socialnetwork");
+
+			app.UseEndpoints(endpoints =>
+			{
+				endpoints.MapHub<Pages.Messenger.LongPoolHub>("/messenger/chat/longpooling");
+			});
 
 			app.Run();
 		}

@@ -3,10 +3,223 @@
 @{
 	Layout = "..\\Shared\\_LayoutIndex.cshtml";
 }
+<style>
+	.container-chat {
+		height: 80vh;
+		overflow-y: scroll;
+	}
+
+	.chat-wrap {
+		position: relative;
+		height: 100%;
+	}
+
+	.chat-list {
+		height: calc(100% - 80px);
+	}
+
+		.chat-list .media {
+			margin-bottom: 10px;
+		}
+
+			.chat-list .media .media-body {
+				max-width: 60%;
+				display: inline-block;
+			}
+
+			.chat-list .media img {
+				width: 50px;
+				height: 50px;
+			}
+
+		.chat-list h5 a {
+			color: #000;
+			text-decoration: none;
+		}
+
+		.chat-list .msg-received {
+			background-color: #f8f9fa;
+			border-radius: 10px;
+			padding: 10px;
+			margin-left: 10px;
+			overflow-wrap: break-word;
+			white-space: pre-wrap;
+		}
+
+		.chat-list .msg-sent {
+			background-color: #D9E6F2;
+			border-radius: 10px;
+			overflow-wrap: break-word;
+			padding: 10px;
+			margin-right: 10px;
+			white-space: pre-wrap;
+		}
+
+	.chat-input {
+		position: sticky;
+		bottom: 0;
+		width: 100%;
+		background-color: #fff;
+		z-index: 9999;
+	}
+
+		.chat-input .form-control {
+			flex-grow: 1;
+		}
+
+	/* Fix for Safari bug */
+	media screen and (min-width: 992px) {
+		.chat-wrap
+
+	{
+		display: flex;
+		flex-direction: column;
+	}
+
+	}
+</style>
+<div class="container">
+	@if (Model.Chat.Type == "self")
+	{
+		<h3>Избранное</h3>
+	}
+	else
+	{
+		<h3>Чат с пользователями</h3>
+	}
+	<div class="container container-chat" style="padding-bottom: 30px; background-color: rgba(0, 0, 0, 0.01);" id="RootChat">
+		<div class="chat-wrap">
+			<div class="row" style="height: calc(100% - 20px)">
+				<div class="col-md-12">
+					<div class="chat-list" id="Chat">
+						@foreach (var message in Model.Chat.Messages)
+						{
+							if (message.IdUser == Model._User.Id)
+							{
+								<ul class="list-unstyled">
+									<li class="media d-flex justify-content-end">
+										<div class="media-body text-right">
+											<p class="msg-sent">@message.Text</p>
+										</div>
+									</li>
+								</ul>
+							}
+							else
+							{
+								<ul class="list-unstyled">
+									<li class="media">
+										<img src="@Model.Chat.Users.First((i)=>i.Id == message.IdUser).ImageUrl" class="mr-3 rounded-circle" alt="Фото" style="width:40px; height: 40px; object-fit: contain;">
+										<div class="media-body">
+											<h5 class="mt-0 mb-1"><a href="profile1.html">Имя Фамилия 1</a></h5>
+											<p class="msg-received">@message.Text</p>
+										</div>
+									</li>
+								</ul>
+							}
+						}
+					</div>
+
+					<div class="chat-input">
+						<div class="input-group mb-3">
+							<textarea class="form-control" rows="1" placeholder="Введите сообщение" id="message-input" style="resize: none;overflow: auto;"></textarea>
+							<div class="input-group-append" style="margin-top: auto;">
+								<button class="btn btn-primary" id="send-button" type="button">Отправить</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="~/js/signalr.min.js"></script>
+<script>
+	const hubConnection = new signalR.HubConnectionBuilder()
+		.withUrl("/messenger/chat/longpooling")
+		.build();
+
+	const sendButton = document.getElementById("send-button");
+	const messageInput = document.getElementById("message-input");
+
+	const RootChat = document.getElementById('RootChat');
+	RootChat.scrollTo(0, RootChat.scrollHeight);
 
 
-<h1>
-	@Model._User.Id
-	@Model.Chat.Id
-	@Model.Chat.IdUserAdmin
-</h1>
+	messageInput.addEventListener("keydown", function (event) {
+		// Ограничение на максимальную высоту
+		const lineHeight = parseInt(window.getComputedStyle(messageInput).getPropertyValue("line-height"), 10);
+		const minRows = 1;
+		const maxRows = 10;
+		const currentRows = (messageInput.scrollHeight / lineHeight);
+		if (currentRows >= maxRows) {
+			messageInput.style.overflow = "auto";
+			return;
+		}
+		const nextRows = Math.max(currentRows + event.key.split("\n").length - 1, minRows);
+		messageInput.style.overflow = "hidden";
+		messageInput.style.height = `${nextRows * lineHeight}px`;
+	});
+	messageInput.addEventListener("keyup", function (event) {
+		if (event.keyCode === 13 && !event.shiftKey) { // KeyCode для Enter
+			event.preventDefault();
+			sendMessage();
+		}
+	});
+	sendButton.addEventListener("click", sendMessage);
+	messageInput.addEventListener("keydown", function (event) {
+		if (event.keyCode === 13 && !event.shiftKey) { // KeyCode для Enter
+			event.preventDefault();
+			sendMessage();
+		}
+	});
+
+
+	function sendMessage() {
+		const message = messageInput.value;
+		// Здесь можно добавить код для отправки сообщения
+		hubConnection.invoke("SendMessage", "" + @Model.Chat.Id, message);
+		messageInput.value = "";
+
+		const lineHeight = parseInt(window.getComputedStyle(messageInput).getPropertyValue("line-height"), 10);
+		const nextRows = 1;
+		messageInput.style.height = `${nextRows * lineHeight}px`;
+	}
+
+	hubConnection.on("ReceiveMessage", function (message) {
+		if (message["idUser"] == "" + @Model._User.Id) {
+			const chatList = document.getElementById('Chat');
+
+
+			// создаем новый элемент li
+			const newMessage = document.createElement('li');
+			newMessage.classList.add('media', 'd-flex', 'justify-content-end');
+
+			// создаем div для тела сообщения и добавляем его в новый элемент li
+			const messageBody = document.createElement('div');
+			messageBody.classList.add('media-body', 'text-right');
+			newMessage.appendChild(messageBody);
+
+			// создаем тег p для текста сообщения и добавляем его в div тела сообщения
+			const messageText = document.createElement('p');
+			messageText.classList.add('msg-sent');
+			messageText.textContent = message["text"];
+			messageBody.appendChild(messageText);
+
+			// добавляем новый элемент li в список чата
+			chatList.appendChild(newMessage);
+			RootChat.scrollTo(0, RootChat.scrollHeight);
+		}
+		else {
+
+		}
+
+	});
+
+	hubConnection.start().then(function () {
+		hubConnection.invoke("JoinChat", "" + @Model.Chat.Id);
+
+	});
+	window.addEventListener("beforeunload", function () {
+		hubConnection.invoke("LeaveChat", "" + @Model.Chat.Id);
+	});
+</script>

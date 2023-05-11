@@ -10,43 +10,34 @@
 	}
 	else
 	{
-		<div class="row" style=" background-color: rgba(0, 0, 0, 0.05);">
-			<div class="col-md-3 col-sm-12">
-				<img src="@Model._User.ImageUrl" style="width: 200px; height: 200px; object-fit: contain;" alt="У вас нет аватара" class="img-responsive">
+		<div class="row bg-light">
+			<div class="col-md-3 col-sm-12 d-flex align-items-center">
+				<img src="@Model._User.ImageUrl" alt="У вас нет аватара" class="img-fluid" style="width: 200px; height: 200px; object-fit: contain;">
 			</div>
-			<div class="col-md-9 col-sm-12 profile-block">
-				<div class="row">
-					<div class="col-md-6">
-						<div class="profile-block-left" style="font-size: 32px;">
-							@Model._User.Name_1
-							@Model._User.Name_2
-							@Model._User.Name_3
-						</div>
-					</div>
-					<div class="col-md-6">
-						<div class="profile-block-right">
-							<ul class="navbar-nav">
-								<li class="nav-item dropdown">
-									<a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Действия</a>
-									<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-										@if (@User.FindFirst("id").Value.ToString() == @Model._User.Id)
-										{
-											<li><a class="dropdown-item" href="/messenger/chat?id=-1">Написать самому себе</a></li>
-
-										}
-										else
-										{
-											<li><a class="dropdown-item" href="/account/ProfileSettings">Написать сообщение</a></li>
-											<li><a class="dropdown-item" href="/Authorization/Login?type=logout">Добавить в друзья</a></li>
-										}
-										
-									</ul>
-								</li>
-							</ul>
-
-						</div>
-					</div>
-				</div>
+			<div class="col-md-6 col-sm-12 text-start d-flex align-items-center">
+				<h2 style="font-size: 32px;">
+					@Model._User.Name_1
+					@Model._User.Name_2
+					@Model._User.Name_3
+				</h2>
+			</div>
+			<div class="col-md-3 col-sm-12 d-flex flex-row-reverse align-items-center" style="margin-bottom: auto;">
+				<ul class="navbar-nav">
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Действия</a>
+						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+							@if (@User.FindFirst("id").Value.ToString() == @Model._User.Id)
+							{
+								<li><a class="dropdown-item" href="/messenger/chat?id=-1">Написать самому себе</a></li>
+							}
+							else
+							{
+								<li><a class="dropdown-item" href="/messenger/chat/new?id_user=@Model._User.Id&type=chat">Написать сообщение</a></li>
+								<li><a class="dropdown-item" href="#">Добавить в друзья</a></li>
+							}
+						</ul>
+					</li>
+				</ul>
 			</div>
 		</div>
 		<div class="row">
