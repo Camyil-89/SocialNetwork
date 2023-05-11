@@ -30,7 +30,7 @@
 		{
 			<div class="col-sm-4 card-friend" data-id="@user.Id">
 				<div class="card">
-					@*<img class="card-img-top" src="friend3.jpg" alt="Друг 3">*@
+					<img class="card-img-top" style="max-height: 150px; object-fit: contain;" src="@user.ImageUrl" alt="~/images/no_image.png">
 					<div class="card-body">
 						<a>@user.Name_1 @user.Name_2 @user.Name_3</a>
 						<p class="card-text">ID: @user.Id</p>

@@ -1,18 +1,51 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MySql.Data.MySqlClient;
+using SocialNetwork.Models;
+using SocialNetwork.Service.DataBase;
 using SocialNetwork.Utilities.Logging;
+using System.Data;
 
 namespace SocialNetwork.Pages.Account
 {
+	[Authorize(Roles = "authorization")]
 	public class ProfileSettingsModel : PageModel
 	{
 		public string ErrorMessageUserName { get; set; } = "";
 		public string ErrorMessagePassword { get; set; } = "";
+		public string ErrorMessageChangeImage { get; set; } = "";
+		public string ImageUrl { get; set; } = "";
+
 		public void OnGet()
 		{
+			try
+			{
+				var user = DataBaseProvider.CreateProvider(DataBaseProvider.DataBase.SqlGetUser(User.FindFirst("id").Value));
+				ImageUrl = user.GetBase64Image();
+			}
+			catch { }
 		}
 
+		[HttpPost]
+		public async Task<IActionResult> OnPostSendFile(string file)
+		{
+			Console.WriteLine($"ASDAS: {file} {HttpContext.Request.Form.Files.GetFile(file)}");
+
+			try
+			{
+				using (MemoryStream fl = new MemoryStream())
+				{
+					HttpContext.Request.Form.Files.First().CopyTo(fl);
+					DataBaseProvider.DataBase.SqlSaveImage(User.FindFirst("id").Value, fl);
+					var bytes = fl.ToArray();
+					ImageUrl = string.Format("data:image/png;base64,{0}", Convert.ToBase64String(bytes, 0, bytes.Length));
+				}
+			}
+			 catch (Exception ex) { Log.WriteLine(ex, Utilities.Logging.LogLevel.Error); ErrorMessageChangeImage = "Не удалось поменять изображение!"; return null;  }
+			
+			return Redirect(Service.RedirectManager.Manager.PathToSettingsProfile);
+		}
 		[HttpPost]
 		public async Task<IActionResult> OnPostChangePassword(string inputPassword, string inputConfirmPassword)
 		{

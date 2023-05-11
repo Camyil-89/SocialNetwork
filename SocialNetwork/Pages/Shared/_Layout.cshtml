@@ -19,7 +19,6 @@
 				</button>
 				<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
 					<ul class="navbar-nav flex-grow-1">
-						
 					</ul>
 					<ul class="navbar-nav">
 						@if (Context.User.IsInRole("authorization"))
@@ -42,13 +41,24 @@
 				</div>
 			</div>
 		</nav>
+
 		<div style="width: 60%; margin: 0 auto; height: 100%; margin-top: 60px;">
 			<main role="main" class="pb-3">
-				@RenderBody()
+				@if (Service.DataBase.DataBaseProvider.IsConnecting)
+				{
+					@RenderBody()
+				}
+				else
+				{
+					<div style="text-align: center; color: red;">
+						<h1>К сожалению сайт не работает в данный момент!</h1>
+					</div>
+					@RenderBody()
+				}
 			</main>
 		</div>
 	</div>
-		
+
 
 	<footer class="border-top footer text-muted">
 		<div class="container">

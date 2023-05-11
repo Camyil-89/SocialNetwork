@@ -18,6 +18,7 @@ namespace SocialNetwork.Utilities.DataBase
 		public DataTable SqlLoginUser(string login, string pass);
 		public DataTable SqlGetUser(string id);
 		public DataTable SqlGetAllUsers();
+		public DataTable SqlSaveImage(string id, MemoryStream stream);
 		public DataTable SqlQuery(MySqlCommand command);
 		public bool Connecting();
 	}

@@ -9,15 +9,30 @@
 		overflow: hidden;
 		margin-top: 10px;
 	}
-	.fix-left{
+
+	.fix-left {
 		min-width: 200px;
 	}
 
 </style>
 <div class="container">
-	<form class="row border-bottom pb-3" method="post" asp-page-handler="ChangeName">
+	@*Profile*@
+	<form class="row pb-3" method="post" asp-page-handler="SendFile" enctype='multipart/form-data'>
 		<div class="col-md-3 fix-left">
 			<h4>Общие настройки</h4>
+			<div style="color: red">@Model.ErrorMessageChangeImage</div>
+		</div>
+		<div class="col-md-9">
+			<div class="form-group">
+				<label>Аватар профиля</label>
+				<img class="form-control" style="width: 200px; height: 200px; object-fit: contain;" src="@Model.ImageUrl" />
+				<input type="file" class="form-control" name="file" placeholder="Введите свое имя" required>
+				<button type="submit" class="btn btn-primary btn-block">Изменить</button>
+			</div>
+		</div>
+	</form>
+	<form class="row border-bottom pb-3" method="post" asp-page-handler="ChangeName">
+		<div class="col-md-3 fix-left">
 			<div style="color: red">@Model.ErrorMessageUserName</div>
 		</div>
 		<div class="col-md-9">
@@ -39,8 +54,10 @@
 			<button type="submit" class="btn btn-primary btn-block">Сохранить изменения</button>
 		</div>
 	</form>
+
+	@*Security*@
 	<form class="row border-bottom pb-3" method="post" asp-page-handler="ChangePassword" onsubmit="return checkPasswords()">
-		<div class="col-md-3">
+		<div class="col-md-3 fix-left">
 			<h4>Настройки безопастности</h4>
 			<div style="color: red">@Model.ErrorMessagePassword</div>
 		</div>
@@ -54,8 +71,8 @@
 				<input type="password" class="form-control" name="inputConfirmPassword" id="inputConfirmPassword" placeholder="Подтвердите свой пароль" required>
 			</div>
 		</div>
-		<div class="col-md-3">
-			<button type="submit" class="btn btn-primary">Сохранить изменения</button>
+		<div class="col-md-3 fix-left">
+			<button type="submit" class="btn btn-primary btn-block">Сохранить изменения</button>
 		</div>
 	</form>
 </div>

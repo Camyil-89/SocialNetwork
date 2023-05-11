@@ -1,5 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Relational;
+using SocialNetwork.Utilities.Cryptography;
 using SocialNetwork.Utilities.Logging;
 using System;
 using System.Collections;
@@ -18,7 +19,7 @@ namespace SocialNetwork.Utilities.DataBase
 		private MySqlConnection _sql_connection;
 		public bool Connect()
 		{
-			if (_sql_connection == null) 
+			if (_sql_connection == null)
 				_sql_connection = new MySqlConnection(_connection);
 
 			if (Connecting() == false)
@@ -27,7 +28,8 @@ namespace SocialNetwork.Utilities.DataBase
 				{
 					_sql_connection.Open();
 					return true;
-				} catch (Exception ex) { }
+				}
+				catch (Exception ex) { }
 				return false;
 			}
 			return true;
@@ -75,6 +77,13 @@ namespace SocialNetwork.Utilities.DataBase
 			}
 			catch (Exception ex) { Log.WriteLine(ex, LogLevel.Error); return null; }
 		}
+		public void CreateChat(string id_user, string type)
+		{
+			MySqlCommand command = new MySqlCommand($"INSERT INTO `chats` (`id`, `id_admin_user`, `chat_type`) VALUES (NULL, @id, @type);");
+			command.Parameters.AddWithValue($"@id", id_user);
+			command.Parameters.AddWithValue($"@type", type);
+			SqlExecute(command);
+		}
 		public DataTable SqlNewUser(string login, string pass, string username_1, string username_2, string username_3)
 		{
 			MySqlCommand command = new MySqlCommand($"INSERT INTO `users` (`id`, `login`, `password`, `username_1`, `username_2`, `username_3`) VALUES (NULL, @login, @pass, @name_1, @name_2, @name_3);", _sql_connection);
@@ -105,6 +114,13 @@ namespace SocialNetwork.Utilities.DataBase
 		{
 			MySqlCommand command = new MySqlCommand($"SELECT * FROM `users` WHERE `id` = @id;");
 			command.Parameters.AddWithValue("@id", id);
+			return SqlExecute(command);
+		}
+		public DataTable SqlSaveImage(string id, MemoryStream stream)
+		{
+			MySqlCommand command = new MySqlCommand($"UPDATE `users` SET `image_avatar` = @image WHERE `id` = @id;");
+			command.Parameters.AddWithValue("@id", id);
+			command.Parameters.AddWithValue("@image", stream.ToArray());
 			return SqlExecute(command);
 		}
 	}
