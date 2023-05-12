@@ -3,6 +3,7 @@ using Org.BouncyCastle.Crypto.Operators;
 using Org.BouncyCastle.Security.Certificates;
 using SocialNetwork.Models;
 using SocialNetwork.Utilities.Logging;
+using System;
 using System.Data;
 using System.Text;
 
@@ -67,12 +68,11 @@ namespace SocialNetwork.Service.DataBase
 	public static class DataBaseProvider
 	{
 		public static Utilities.DataBase.IDataBaseProvider DataBase = new Utilities.DataBase.MySQLPHPAdmin();
-		public static bool IsConnecting { get => DataBase.Connecting(); }
+		public static bool IsConnecting { get => true; }
 
 		public static void Init(string connect)
 		{
 			DataBase.SetConnectString(connect);
-			DataBase.Connect();
 			Log.WriteLine($"DataBaseProvider.Init: {IsConnecting}");
 		}
 		public static List<User> GetAllUsers()
@@ -105,6 +105,8 @@ namespace SocialNetwork.Service.DataBase
 			MySqlCommand command = new MySqlCommand("SELECT * FROM `members_chat` WHERE id_chat = @chat;");
 			command.Parameters.AddWithValue($"@chat", id_chat);
 			var answer_1 = DataBase.SqlQuery(command);
+			if (IsNullOrEmpty(answer_1))
+				return users;
 			foreach (DataRow i in answer_1.Rows)
 			{
 				users.Add(CreateProvider(DataBase.SqlGetUser(i[2].ToString())).GetUser());
@@ -169,6 +171,7 @@ namespace SocialNetwork.Service.DataBase
 			message.IdChat = provider.GetValueFromColumn("id_chat");
 			message.Id = provider.GetValueFromColumn("id");
 			message.IdUser = provider.GetValueFromColumn("id_user");
+			message.User = CreateProvider(DataBase.SqlGetUser(provider.GetValueFromColumn("id_user"))).GetUser();
 
 			return message;
 		}
@@ -183,7 +186,7 @@ namespace SocialNetwork.Service.DataBase
 			if (IsNullOrEmpty(answer) == false)
 			{
 				chat.IdUserAdmin = answer.Rows[0][1].ToString();
-				chat.Type = answer.Rows[0][2].ToString();
+				chat.TypeChat = answer.Rows[0][2].ToString();
 			}
 
 			chat.Users = ChatUsers(id_chat);
@@ -193,7 +196,7 @@ namespace SocialNetwork.Service.DataBase
 		}
 		public static List<string> GetMyChats(string id)
 		{
-			MySqlCommand command = new MySqlCommand("SELECT `id` FROM `members_chat` WHERE `members_chat`.`id_user` = @id;");
+			MySqlCommand command = new MySqlCommand("SELECT `id_chat` FROM `members_chat` WHERE `members_chat`.`id_user` = @id;");
 			command.Parameters.AddWithValue($"@id", id);
 			var answer = DataBase.SqlQuery(command);
 			if (IsNullOrEmpty(answer) == false)
@@ -210,11 +213,25 @@ namespace SocialNetwork.Service.DataBase
 		}
 		public static List<string> UserInChats(List<string> chats, string id_user, string type)
 		{
-			MySqlCommand command = new MySqlCommand($"SELECT * FROM `members_chat` INNER JOIN `chats` ON `chats`.`id` = `members_chat`.`id` WHERE `members_chat`.`id_user` = @id and `chats`.`chat_type` = @type and `members_chat`.`id_chat` IN ({string.Join(", ",chats)});");
+			Console.WriteLine($"A<SDA<S>>>{string.Join(",", chats)}");
+			MySqlCommand command = new MySqlCommand($"SELECT `id_chat` FROM `members_chat` INNER JOIN `chats` ON `chats`.`id` = `members_chat`.`id_chat` WHERE `members_chat`.`id_user` = @id and `chats`.`chat_type` = @type and `members_chat`.`id_chat` IN ({string.Join(", ", chats)});");
 			command.Parameters.AddWithValue($"@id", id_user);
 			command.Parameters.AddWithValue($"@type", type);
 			var answer = DataBase.SqlQuery(command);
-			return null;
+			List<string> list = new List<string>();
+
+			if (IsNullOrEmpty(answer))
+			{
+				return list;
+			}
+
+			foreach (DataRow i in answer.Rows)
+			{
+				list.Add(i[0].ToString());
+				Console.WriteLine(i);
+			}
+
+			return list;
 		}
 		public static string GetIdChatFromIdUser(string id1, string id2, string type)
 		{
@@ -230,9 +247,19 @@ namespace SocialNetwork.Service.DataBase
 			}
 			return "";
 		}
-		public static void CreateChat(string id_user1, string id_user2)
+		public static string CreateChat(string id_user_admin, string id_user2, string type)
 		{
+			MySqlCommand command = new MySqlCommand("INSERT INTO `chats` (`id`, `id_admin_user`, `chat_type`) VALUES(NULL, @id_admin, @type);SELECT LAST_INSERT_ID();");
+			command.Parameters.AddWithValue($"@id_admin", id_user_admin);
+			command.Parameters.AddWithValue($"@type", type);
+			var id_chat = DataBase.SqlQuery(command).Rows[0][0].ToString();
 
+			command = new MySqlCommand("INSERT INTO `members_chat` (`id`, `id_chat`, `id_user`) VALUES (NULL, @id_chat, @id_user);");
+			command.Parameters.AddWithValue($"@id_chat", id_chat);
+			command.Parameters.AddWithValue($"@id_user", id_user2);
+			var answer = DataBase.SqlQuery(command);
+			Console.WriteLine($"CREATECHAT: {id_chat}");
+			return id_chat;
 		}
 		public static DataProvider CreateProvider(DataTable dataTable)
 		{

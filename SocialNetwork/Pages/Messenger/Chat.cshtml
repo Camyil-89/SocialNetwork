@@ -79,7 +79,7 @@
 	}
 </style>
 <div class="container">
-	@if (Model.Chat.Type == "self")
+	@if (Model.IsSelf)
 	{
 		<h3>Избранное</h3>
 	}
@@ -92,31 +92,6 @@
 			<div class="row" style="height: calc(100% - 20px)">
 				<div class="col-md-12">
 					<div class="chat-list" id="Chat">
-						@foreach (var message in Model.Chat.Messages)
-						{
-							if (message.IdUser == Model._User.Id)
-							{
-								<ul class="list-unstyled">
-									<li class="media d-flex justify-content-end">
-										<div class="media-body text-right">
-											<p class="msg-sent">@message.Text</p>
-										</div>
-									</li>
-								</ul>
-							}
-							else
-							{
-								<ul class="list-unstyled">
-									<li class="media">
-										<img src="@Model.Chat.Users.First((i)=>i.Id == message.IdUser).ImageUrl" class="mr-3 rounded-circle" alt="Фото" style="width:40px; height: 40px; object-fit: contain;">
-										<div class="media-body">
-											<h5 class="mt-0 mb-1"><a href="profile1.html">Имя Фамилия 1</a></h5>
-											<p class="msg-received">@message.Text</p>
-										</div>
-									</li>
-								</ul>
-							}
-						}
 					</div>
 
 					<div class="chat-input">
@@ -143,7 +118,6 @@
 
 	const RootChat = document.getElementById('RootChat');
 	RootChat.scrollTo(0, RootChat.scrollHeight);
-
 
 	messageInput.addEventListener("keydown", function (event) {
 		// Ограничение на максимальную высоту
@@ -177,7 +151,7 @@
 	function sendMessage() {
 		const message = messageInput.value;
 		// Здесь можно добавить код для отправки сообщения
-		hubConnection.invoke("SendMessage", "" + @Model.Chat.Id, message);
+		hubConnection.invoke("SendMessage", "" + @Model.IdChat, message);
 		messageInput.value = "";
 
 		const lineHeight = parseInt(window.getComputedStyle(messageInput).getPropertyValue("line-height"), 10);
@@ -210,16 +184,95 @@
 			RootChat.scrollTo(0, RootChat.scrollHeight);
 		}
 		else {
+			console.log(message)
+			// Найти список чата по ID
+			const chatList = document.getElementById('Chat');
 
+			// Создать новый элемент списка
+			const topUl = document.createElement('ul');
+			topUl.classList.add("list-unstyled");
+			const newMessage = document.createElement('li');
+			newMessage.classList.add('media');
+
+			// Добавить внутренние элементы в новый элемент списка
+			const newImage = document.createElement('img');
+			newImage.setAttribute('src', message["user"]["imageUrl"]);
+			newImage.classList.add('mr-3', 'rounded-circle');
+			newImage.setAttribute('alt', 'Фото');
+			newImage.style.width = '40px';
+			newImage.style.height = '40px';
+			newImage.style.objectFit = 'contain';
+			newMessage.appendChild(newImage);
+
+			const newBody = document.createElement('div');
+			newBody.classList.add('media-body');
+			newMessage.appendChild(newBody);
+
+			const newTitle = document.createElement('h5');
+			newTitle.classList.add('mt-0', 'mb-1');
+			newBody.appendChild(newTitle);
+
+			const newLink = document.createElement('a');
+			newLink.setAttribute('href', "/account/profile?id=" + message["user"]["id"]);
+			newLink.textContent = message["user"]["name_1"] + " " + message["user"]["name_2"] + " " + message["user"]["name_3"];
+			newTitle.appendChild(newLink);
+
+			const newMessageBody = document.createElement('p');
+			newMessageBody.classList.add('msg-received');
+			newMessageBody.textContent = message.text;
+			newBody.appendChild(newMessageBody);
+
+
+			topUl.appendChild(newMessage);
+			chatList.appendChild(topUl);
+			RootChat.scrollTo(0, RootChat.scrollHeight);
 		}
 
 	});
 
 	hubConnection.start().then(function () {
-		hubConnection.invoke("JoinChat", "" + @Model.Chat.Id);
-
+		hubConnection.invoke("JoinChat", "" + @Model.IdChat);
+		LoadChat();
 	});
+	function LoadChat()
+	{
+		getJson('chat/messages?id_chat=' + @Model.IdChat, async function (data) {
+			const chatList = document.getElementById('Chat');
+			const cacheUsers = {};
+			for (let i = 0; i < data.length; i++) {
+				let msg = data[i];
+				let newElement = document.createElement("ul");
+				newElement.classList.add("list-unstyled");
+
+				if (msg["idUser"] == "@Model._User.Id") {
+					newElement.innerHTML = `<li class="media d-flex justify-content-end"><div class="media-body text-right"><p class="msg-sent">${msg["text"]}</p></div></li>`;
+					chatList.appendChild(newElement);
+				}
+				else {
+					if (cacheUsers[msg["idUser"]] == undefined) {
+						let data = {};
+
+						await fetch(`/account/profile/user?id_user=${msg["idUser"]}`)
+							.then(response => response.json())
+							.then(json => {
+								cacheUsers[msg["idUser"]] = json;
+							}).catch(error => console.error(error));
+					}
+					let user = cacheUsers[msg["idUser"]];
+					newElement.innerHTML = `<li class="media"><img src="${user["imageUrl"]}" class="mr-3 rounded-circle" alt="Фото" style="width:40px; height: 40px; object-fit: contain;">
+							<div class="media-body">
+									  <h5 class="mt-0 mb-1"><a href="/account/profile?id=${msg["idUser"]}">${user["name_1"]} ${user["name_2"]} ${user["name_3"]}</a></h5>
+							  <p class="msg-received">${msg["text"]}</p>
+							</div></li>`;
+
+					// Добавляем его в конец контейнера
+					chatList.appendChild(newElement);
+				}
+			}
+			RootChat.scrollTo(0, RootChat.scrollHeight);
+		});
+	}
 	window.addEventListener("beforeunload", function () {
-		hubConnection.invoke("LeaveChat", "" + @Model.Chat.Id);
+		hubConnection.invoke("LeaveChat", "" + @Model.IdChat);
 	});
 </script>

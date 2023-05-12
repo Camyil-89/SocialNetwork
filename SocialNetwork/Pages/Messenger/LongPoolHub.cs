@@ -8,17 +8,20 @@ namespace SocialNetwork.Pages.Messenger
 	{
 		public async Task JoinChat(string chatId)
 		{
+			Console.WriteLine($"JoinChat: {chatId}");
 			if (DataBaseProvider.UserInChat(chatId, Context.User.FindFirst("id").Value.ToString()))
 				await Groups.AddToGroupAsync(Context.ConnectionId, chatId);
 		}
 
 		public async Task LeaveChat(string chatId)
 		{
+			Console.WriteLine($"LeaveChat: {chatId}");
 			await Groups.RemoveFromGroupAsync(Context.ConnectionId, chatId);
 		}
 
 		public async Task SendMessage(string chatId, string message)
 		{
+			Console.WriteLine($"SendMessage: {chatId};{message}");
 			if (string.IsNullOrEmpty(message))
 				return;
 			if (DataBaseProvider.UserInChat(chatId, Context.User.FindFirst("id").Value.ToString()))

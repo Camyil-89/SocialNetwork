@@ -14,9 +14,18 @@ namespace SocialNetwork.Controllers
 		[HttpGet]
 		public async Task<IActionResult> OnCreateNewChat(string id_user, string type)
 		{
-			var chats = DataBaseProvider.GetMyChats(User.FindFirst("id").Value.ToString());
-			DataBaseProvider.UserInChats(chats, User.FindFirst("id").Value.ToString(), "self");
-			return Redirect($"{Manager.PathToChat}?id={id_user}");
+			try
+			{
+				var user_admin = User.FindFirst("id").Value.ToString();
+
+				var chats = DataBaseProvider.GetMyChats(user_admin);
+				var ids_chat = DataBaseProvider.UserInChats(chats, id_user, "chat");
+				if (ids_chat.Count > 0)
+					return Redirect($"{Manager.PathToChat}?id={ids_chat[0]}");
+				return Redirect($"{Manager.PathToChat}?id={DataBaseProvider.CreateChat(user_admin, id_user, "chat")}");
+			}
+			catch { }
+			return Redirect(Manager.PathToMainPage);
 		}
 	}
 }

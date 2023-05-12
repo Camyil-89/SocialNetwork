@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SocialNetwork.Controllers;
 using SocialNetwork.Models;
 using SocialNetwork.Service.DataBase;
+using SocialNetwork.Service.RedirectManager;
 using System.Data;
 
 namespace SocialNetwork.Pages.Messenger
@@ -12,26 +14,36 @@ namespace SocialNetwork.Pages.Messenger
 	{
 		public User _User { get; set; } = new User();
 
-		public Chat Chat = new Chat();
+		public string IdChat { get; set; } = "";
+		public bool IsSelf { get; set; } = false;
 
-		public void OnGet(string id)
+		public IActionResult OnGet(string id)
 		{
+			if (string.IsNullOrEmpty(id))
+				return null;
 			try
 			{
 				_User = DataBaseProvider.CreateProvider(DataBaseProvider.DataBase.SqlGetUser(User.FindFirst("id").Value.ToString())).GetUser();
 				if (id == "-1")
 				{
-					Chat = DataBaseProvider.GetChat(DataBaseProvider.GetIdSelfChat(_User.Id));
+					IdChat = DataBaseProvider.GetIdSelfChat(_User.Id);
+					IsSelf = true;
 				}
 				else
 				{
 					if (DataBaseProvider.UserInChat(id, _User.Id))
 					{
-						Chat = DataBaseProvider.GetChat(DataBaseProvider.GetIdSelfChat(id));
+						IdChat = id;
+						
+					}
+					else
+					{
+						return Redirect(Manager.PathToMainPage);
 					}
 				}
 			}
 			catch { }
+			return null;
 		}
 	}
 }
