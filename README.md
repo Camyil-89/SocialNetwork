@@ -2,14 +2,14 @@
 # Base
 [socialnetwork.zip](https://github.com/Camyil-89/SocialNetwork/files/11491469/socialnetwork.zip)
 
-![image](https://github.com/Camyil-89/SocialNetwork/assets/76705837/b71892d2-550d-4df4-8953-049c41ac4780)
+![image](https://github.com/Camyil-89/SocialNetwork/assets/76705837/d7b02dea-bd29-493d-a256-e9b31f899ee5)
 
-![image](https://github.com/Camyil-89/SocialNetwork/assets/76705837/26a55066-3508-4e7a-8825-ef2c87e76321)
+![image](https://github.com/Camyil-89/SocialNetwork/assets/76705837/06458e70-5f72-43c2-9f23-739d5d58821b)
 
-![image](https://github.com/Camyil-89/SocialNetwork/assets/76705837/33806707-1d2c-470b-a61f-b34ec3fb3b6d)
+![image](https://github.com/Camyil-89/SocialNetwork/assets/76705837/455abe88-bc16-459d-be38-11835048867a)
 
-![image](https://github.com/Camyil-89/SocialNetwork/assets/76705837/3c2ef1b2-1268-496d-a1df-980ffc1eb9dd)
+![image](https://github.com/Camyil-89/SocialNetwork/assets/76705837/7d845d47-0ffd-4618-ba97-89c626929e3f)
 
-![image](https://github.com/Camyil-89/SocialNetwork/assets/76705837/7abcb88d-0228-4da0-a465-85b36c65e546)
+![image](https://github.com/Camyil-89/SocialNetwork/assets/76705837/2a902304-2e71-4129-ae74-79f5b7feb9da)
 
-![image](https://github.com/Camyil-89/SocialNetwork/assets/76705837/547fe2e5-7bef-4002-8cc0-16e1e8d974c7)
+![image](https://github.com/Camyil-89/SocialNetwork/assets/76705837/3a8ee660-f74c-493b-b5b6-98d37aac6f99)
