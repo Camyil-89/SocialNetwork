@@ -1,4 +1,5 @@
-# SocialNetwork
+# SocialNetwork 
+Небольшое подобие социальной сети, сделанная за пару вечеров. Что тут есть: чат. (ну а как ты хотел?)
 # Base
 [socialnetwork.zip](https://github.com/Camyil-89/SocialNetwork/files/11491469/socialnetwork.zip)
 
